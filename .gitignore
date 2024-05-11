@@ -163,4 +163,4 @@ cython_debug/
 images/
 barcode_bb/
 *.pt
-wandb/*
+wandb/
