@@ -11,7 +11,7 @@ from ocr.model import OcrModel
 
 app = FastAPI()
 detection_model = Yolov9(weights=Path("./best.pt"))
-ocr_model = OcrModel(weights=Path("..."))
+ocr_model = OcrModel(weights=Path("./crnn_last.pt"))
 
 
 @app.post("/scan/")

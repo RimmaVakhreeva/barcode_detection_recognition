@@ -54,12 +54,12 @@ class Yolov9:
         )
         for i, det in enumerate(pred):
             det[:, :4] = scale_boxes(augmented_image.shape[2:], det[:, :4], image.shape).round()
-        return [bbox.cpu().numpy()[0, :5] for bbox in pred]
+        return [bbox.cpu().numpy()[0, :5] for bbox in pred if len(bbox) > 0]
 
 
 if __name__ == "__main__":
-    weights = Path("/Users/rimma_vakhreeva/PycharmProjects/barcode_detection_recognition/best.pt")
-    images_path = Path("/Users/rimma_vakhreeva/PycharmProjects/barcode_detection_recognition/images/test2017")
+    weights = Path("../best.pt")
+    images_path = Path("../images/test2017")
 
     yolov9 = Yolov9(weights)
     for image_path in images_path.glob('*'):

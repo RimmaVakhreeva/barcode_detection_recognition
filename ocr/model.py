@@ -29,13 +29,15 @@ class OcrModel:
         self.index2char[0] = " "
 
     def recognize(self, image: np.ndarray, bboxes: List[np.ndarray]) -> List[str]:
+        texts = []
         for (x1, y1, x2, y2, conf) in bboxes:
             crop = image[int(y1):int(y2), int(x1):int(x2)]
             crop = cv2.resize(crop, (self.w, self.h))
             crop = np.ascontiguousarray(crop.transpose((2, 0, 1))[::-1] / 255.0)[None, ...]
             pred = self.model(torch.tensor(crop, dtype=torch.float32, device=self.device))
-            texts = self.model.decode_output(pred, vocab=self.vocab)
-            print(f"text: {texts}")
+            text = self.model.decode_output(pred, vocab=self.vocab)[0]
+            texts.append(text)
+        return texts
 
 
 if __name__ == "__main__":
