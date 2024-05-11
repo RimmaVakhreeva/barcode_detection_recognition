@@ -7,24 +7,27 @@ from PIL import Image
 import io
 
 from detection.detect import Yolov9
+from ocr.model import OcrModel
 
 app = FastAPI()
 detection_model = Yolov9(weights=Path("./best.pt"))
+ocr_model = OcrModel(weights=Path("..."))
 
 
 @app.post("/scan/")
 async def scan_barcodes(file: UploadFile = File(...)):
     image_data = await file.read()
-    image = Image.open(io.BytesIO(image_data))
+    image = np.array(Image.open(io.BytesIO(image_data)))
 
-    bboxes = detection_model.detect_barcodes(np.array(image))
+    bboxes = detection_model.detect_barcodes(image)
+    texts = ocr_model.recognize(image, bboxes)
 
     response_data = []
-    for bbox in bboxes:
+    for bbox, text in zip(bboxes, texts):
         response_data.append({
             "bbox": bbox[:4].tolist(),
             "bbox_confidence": bbox[4].tolist(),
-            # "text": barcode.data.decode("utf-8")
+            "text": text
         })
 
     return JSONResponse(content=response_data)
