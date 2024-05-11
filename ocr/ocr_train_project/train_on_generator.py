@@ -14,7 +14,7 @@ config = wandb.config
 wandb.config.vocab = '0123456789'
 wandb.config.seed = 44
 wandb.config.bs = 64
-wandb.config.epoch_size = 1024
+wandb.config.epoch_size = 1024 * 32
 wandb.config.lr = 5e-4
 wandb.config.epochs = 48
 
@@ -42,16 +42,18 @@ wandb.watch(crnn, log_freq=10, log="parameters", log_graph=True)
 
 barcode_loader = torch.utils.data.DataLoader(
     BarcodeDataset(epoch_size=wandb.config.epoch_size, vocab=wandb.config.vocab),
-    batch_size=wandb.config.bs
+    batch_size=wandb.config.bs,
+    num_workers=30
 )
 
 test_barcode_loader = torch.utils.data.DataLoader(
     TestBarcodeDataset(vocab=wandb.config.vocab,
-                       directory='/Users/rimma_vakhreeva/PycharmProjects/barcode_detection_recognition/images/cropped_test_images'),
+                       directory='/home/svakhreev/tmp/barcode_detection_recognition/ocr/ocr_train_project/test_images'),
+    batch_size=32
 )
 
 optimizer = torch.optim.Adam(crnn.parameters(), lr=wandb.config.lr)
-lambda1 = lambda epoch: 1 - epoch / 700
+lambda1 = lambda epoch: 1 - epoch / (700 * 32)
 scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda1)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
