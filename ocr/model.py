@@ -22,7 +22,7 @@ class OcrModel:
             num_classes=11
         )
         self.h, self.w = 280, 523
-        self.model.load_state_dict(torch.load(str(weights)))
+        self.model.load_state_dict(torch.load(str(weights), map_location='cpu'))
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.vocab = '0123456789'
         self.index2char = {idx + 1: char for idx, char in enumerate(self.vocab)}

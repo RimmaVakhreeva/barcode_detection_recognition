@@ -38,28 +38,26 @@ class BarcodeDataset(torch.utils.data.Dataset):
             barcode_image,
             rendered_barcode,
             transforms=alb.Compose([
-                alb.ShiftScaleRotate(shift_limit=0.005, scale_limit=0.005, rotate_limit=(-15, 15),
+                alb.ShiftScaleRotate(shift_limit=0.005, scale_limit=0.005, rotate_limit=(-13, 13),
                                      border_mode=cv2.BORDER_CONSTANT, p=1),
                 alb.GaussNoise(),
                 alb.OneOf([
                     alb.MotionBlur(blur_limit=11, p=0.4),
-                    alb.MedianBlur(blur_limit=11, p=0.4),
+                    alb.MedianBlur(blur_limit=5, p=0.4),
                     alb.Blur(blur_limit=11, p=0.4),
-                ], p=0.8),
+                ], p=0.5),
                 alb.OneOf([
                     alb.OpticalDistortion(p=0.4, border_mode=cv2.BORDER_CONSTANT),
-                    alb.GridDistortion(p=0.4, border_mode=cv2.BORDER_CONSTANT),
-                ], p=0.8),
+                    alb.GridDistortion(p=0.2, border_mode=cv2.BORDER_CONSTANT),
+                ], p=0.4),
                 alb.OneOf([
                     alb.CLAHE(clip_limit=2),
                     alb.RandomBrightnessContrast(),
-                ], p=0.3),
-                alb.HueSaturationValue(p=0.3)
+                ], p=0.2),
+                alb.HueSaturationValue(p=0.3),
+                alb.RGBShift(r_shift_limit=(-20, 20))
             ])
         )
-
-        cv2.imshow("barcode_img", barcode_img)
-        cv2.waitKey(0)
 
         image = torch.FloatTensor(barcode_img / 255.0).permute(2, 0, 1)
         return (
